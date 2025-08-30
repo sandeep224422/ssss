@@ -392,12 +392,51 @@ Will last at least 4 hours
 
 # API
 
+## API Key Authentication
+
+The API now requires an API key for all requests. You must include the `x-api-key` header with your requests.
+
+### Setting up your API key
+
+1. Create a `.env` file in the project root directory
+2. Add your API key to the file:
+   ```
+   API_KEY=your_secret_key_here
+   ```
+3. Replace `your_secret_key_here` with a strong, unique key
+
+### Using the API key
+
+Include the `x-api-key` header in all your API requests:
+
+```shell
+# Example with curl
+curl -H "x-api-key: your_secret_key_here" \
+     "http://localhost:5011/download?url=https://www.youtube.com/watch?v=9Lgc3TxqgHA"
+
+# Example with wget
+wget --header="x-api-key: your_secret_key_here" \
+     "http://localhost:5011/download?url=https://www.youtube.com/watch?v=9Lgc3TxqgHA"
+```
+
+### Default API key
+
+If no API key is set in the `.env` file, the system will use the default key: `default_secret_key`
+
+**⚠️ Security Warning**: Always change the default API key in production environments!
+
+### Error responses
+
+- `403 Forbidden`: API key is missing or invalid
+- `401 Unauthorized`: User token is invalid (existing authentication)
+
 ## Application information
 
 Return the application complete parameters
 
 ```shell
 GET http://localhost:5011/info
+x-api-key: your_secret_key_here
 ```
 
 ### Responses status
@@ -411,12 +450,15 @@ Only the url is required to use the api.
 ```shell
 # Simplest case, uses the DEFAULT preset
 GET http://localhost:5011/download?url=https://www.youtube.com/watch?v=9Lgc3TxqgHA
+x-api-key: your_secret_key_here
 
 # You can download multiple presets at once, if no preset is valid, will download with DEFAULT preset, if at least one preset is valid, will download only valid presets
 GET http://localhost:5011/download?url=https://www.youtube.com/watch?v=Kf1XttuuIiQ&presets=audio,hd
+x-api-key: your_secret_key_here
 
 # If the user management is enabled
 GET http://localhost:5011/download?url=https://www.youtube.com/watch?v=wV4wepiucf4&token=dad_super_password
+x-api-key: your_secret_key_here
 ```
 
 ## Post request
@@ -426,6 +468,7 @@ You can download the video you want by providing the parameters directly in a po
 ```shell
 POST http://localhost:5011/download?url=https://www.youtube.com/watch?v=wV4wepiucf4 &
 token=dad_super_password
+x-api-key: your_secret_key_here
 Content-Type: application/json
 
 {
@@ -449,6 +492,7 @@ It is possible to add a timer to stop the download (`recording_stops_at_end` wil
 
 ```shell
 POST http://localhost:5011/download?url=https://www.youtube.com/watch?v=wV4wepiucf4&token=dad_super_password
+x-api-key: your_secret_key_here
 Content-Type: application/json
 
 {
@@ -471,6 +515,7 @@ preset with `_preset` means `_ignore_default_preset`can't be true.
 You can use the `_cli` attribute here :
 ```shell
 POST http://localhost:5011/download?url=https://www.youtube.com/watch?v=wV4wepiucf4
+x-api-key: your_secret_key_here
 Content-Type: application/json
 
 {

@@ -4,6 +4,7 @@ ffmpeg-python
 humanize
 mergedeep
 psutil
+python-dotenv
 redis
 requests
 rq

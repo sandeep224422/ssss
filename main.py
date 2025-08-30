@@ -6,7 +6,8 @@ from urllib.parse import unquote
 
 import uvicorn
 import yt_dlp.version
-from fastapi import BackgroundTasks, FastAPI, Response, Body
+from fastapi import BackgroundTasks, FastAPI, Response, Body, Request, HTTPException
+from dotenv import load_dotenv
 
 import config_manager
 import download_manager
@@ -14,6 +15,12 @@ import process_utils
 import programmation_persistence_manager
 import ydl_api_ng_utils
 from programmation_class import Programmation
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Define API key - load from environment or use default
+API_KEY = os.getenv('API_KEY', 'default_secret_key')
 
 try:
     os.mkdir('cookies')
@@ -33,6 +40,24 @@ __cm.init_logger(file_name='api.log')
 
 app = FastAPI()
 enable_redis = False if __cm.get_app_params().get('_enable_redis') is not True else True
+
+# API Key Authentication Middleware
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    # Skip API key check for health check endpoints (optional)
+    if request.url.path in ["/docs", "/openapi.json", "/redoc"]:
+        return await call_next(request)
+    
+    # Check for API key in header
+    api_key = request.headers.get("x-api-key")
+    
+    if api_key is None:
+        raise HTTPException(status_code=403, detail="API key required")
+    
+    if api_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Invalid API key")
+    
+    return await call_next(request)
 
 
 ###
