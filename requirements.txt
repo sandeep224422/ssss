@@ -1,0 +1,14 @@
+cronsim
+fastapi
+ffmpeg-python
+humanize
+mergedeep
+psutil
+python-dotenv
+redis
+requests
+rq
+supervisor
+tinydb
+uvicorn
+yt-dlp
